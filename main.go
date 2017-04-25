@@ -42,15 +42,20 @@ func SoManySeriesHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(seriesObj)
 	} else if method == "POST" {
-		decoder := json.NewDecoder(r.Body)
-		var series Series
-		err := decoder.Decode(&series)
-		if err != nil {
-			log.Fatal(err)
+		if CheckAuthentication(r) {
+			decoder := json.NewDecoder(r.Body)
+			var series Series
+			err := decoder.Decode(&series)
+			if err != nil {
+				log.Fatal(err)
+			}
+			series.Id = len(seriesObj)+1
+			seriesObj = append(seriesObj,series)
+			w.WriteHeader(http.StatusCreated)
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
 		}
-		series.Id = len(seriesObj)+1
-		seriesObj = append(seriesObj,series)
-		w.WriteHeader(http.StatusCreated)
+
 	}
 }
 
@@ -76,26 +81,34 @@ func SeriesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case "PUT":
-		seriesID  := -1
-		for i, s := range seriesObj {
-			if strconv.Itoa(s.Id) == vars["id"] {
-				seriesID = i
-			}
-		}
-
-		if seriesID == -1 {
-			w.WriteHeader(http.StatusNotFound)
-		} else {
+		if CheckAuthentication(r){
 			decoder := json.NewDecoder(r.Body)
 			var series Series
 			err := decoder.Decode(&series)
 			if err != nil {
 				log.Fatal(err)
 			}
-			series.Id = seriesObj[seriesID].Id
-			seriesObj[seriesID] = series
-			w.WriteHeader(http.StatusCreated)
+
+			seriesID  := -1
+			for i, s := range seriesObj {
+				if strconv.Itoa(s.Id) == vars["id"] {
+					seriesID = i
+				}
+			}
+
+			if seriesID == -1 {
+				series.Id,_ = strconv.Atoi(vars["id"])
+				seriesObj = append(seriesObj,series)
+				w.WriteHeader(http.StatusCreated)
+			} else {
+				series.Id = seriesObj[seriesID].Id
+				seriesObj[seriesID] = series
+				w.WriteHeader(http.StatusCreated)
+			}
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
 		}
+
 
 	case "DELETE": w.WriteHeader(http.StatusNotImplemented)
 	}
@@ -108,4 +121,12 @@ func InitSeries() SoManySeries {
 	 Series{Id: 2, Title: "Breaking Bad", Type: "Thriller", Author: "Vince Gilligan", Seasons: 5},
 	 Series{Id: 3, Title: "Daredevil", Type: "Superheroes", Author: "Drew Goddard", Seasons: 2},
  }
+}
+
+func CheckAuthentication(r *http.Request) bool{
+
+	header := r.Header
+	authorization := header.Get("Authorization")
+
+	return authorization == "toto"
 }

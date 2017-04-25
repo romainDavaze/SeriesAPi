@@ -115,8 +115,8 @@
           "401" : {
             "description" : "You are not authorized"
           },
-          "404" : {
-            "description" : "Resource not found"
+          "201" : {
+            "description" : "Status 201"
           }
         }
       },
