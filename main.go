@@ -76,6 +76,27 @@ func SeriesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case "PUT":
+		seriesID  := -1
+		for i, s := range seriesObj {
+			if strconv.Itoa(s.Id) == vars["id"] {
+				seriesID = i
+			}
+		}
+
+		if seriesID == -1 {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			decoder := json.NewDecoder(r.Body)
+			var series Series
+			err := decoder.Decode(&series)
+			if err != nil {
+				log.Fatal(err)
+			}
+			series.Id = seriesObj[seriesID].Id
+			seriesObj[seriesID] = series
+			w.WriteHeader(http.StatusCreated)
+		}
+
 	case "DELETE": w.WriteHeader(http.StatusNotImplemented)
 	}
 
