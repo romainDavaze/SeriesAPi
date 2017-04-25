@@ -1,0 +1,163 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "No description",
+    "version" : "1.0.0",
+    "title" : "Series",
+    "contact" : { }
+  },
+  "host" : "localhost:8080",
+  "basePath" : "/series",
+  "schemes" : [ "http" ],
+  "consumes" : [ "application/json" ],
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/" : {
+      "get" : {
+        "summary" : "Get series",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Series"
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Post a series",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Authorization token to check the ability to add a series",
+          "x-example" : "toto"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Series"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Status 201",
+            "schema" : {
+              "required" : [ "ID", "Title" ],
+              "type" : "object",
+              "properties" : {
+                "ID" : {
+                  "type" : "number"
+                },
+                "Title" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "headers" : {
+              "Location" : {
+                "type" : "string"
+              }
+            }
+          },
+          "401" : {
+            "description" : "You are not authorized"
+          }
+        }
+      }
+    },
+    "/{id}" : {
+      "get" : {
+        "summary" : "Get specific series",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Status 200",
+            "schema" : {
+              "$ref" : "#/definitions/Series"
+            }
+          },
+          "404" : {
+            "description" : "Resource not found"
+          }
+        }
+      },
+      "put" : {
+        "summary" : "Update a series",
+        "description" : "Update a series",
+        "consumes" : [ ],
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "description" : "Authorization token to check the ability to update a series",
+          "x-example" : "toto"
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Series"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Status 204"
+          },
+          "401" : {
+            "description" : "You are not authorized"
+          },
+          "404" : {
+            "description" : "Resource not found"
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "Delete a series",
+        "description" : "Delete a series",
+        "parameters" : [ ],
+        "responses" : {
+          "501" : {
+            "description" : "Status 501"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "type" : "string"
+      } ]
+    }
+  },
+  "definitions" : {
+    "Series" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "number"
+        },
+        "Title" : {
+          "type" : "string"
+        },
+        "Author" : {
+          "type" : "string"
+        },
+        "Type" : {
+          "type" : "string"
+        },
+        "Seasons" : {
+          "type" : "integer"
+        }
+      }
+    }
+  }
+}
